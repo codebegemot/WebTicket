@@ -1,0 +1,23 @@
+﻿@{
+    ViewBag.Title = "Просмотр файла";
+    string fileName = ViewBag.FileName;
+    string filePath = ViewBag.FilePath;
+    string fileContent = ViewBag.FileContent;
+}
+
+<div class="container mt-4">
+    <h2>📄 Просмотр файла - @fileName</h2>
+    
+    <div class="mb-3">
+        <a href="/Home/Index?path=@filePath" class="btn btn-secondary">⬅ Назад</a>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            Файл: @fileName
+        </div>
+        <div class="card-body">
+            <pre style="white-space: pre-wrap;">@fileContent</pre>
+        </div>
+    </div>
+</div>
