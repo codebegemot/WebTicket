@@ -1,0 +1,57 @@
+-- 1. Создание роли с логином и паролем
+CREATE ROLE my_user WITH LOGIN PASSWORD 'your_secure_password';
+
+-- 2. Создание баз данных
+CREATE DATABASE test1;
+CREATE DATABASE test2;
+CREATE DATABASE test3;
+CREATE DATABASE test4;
+CREATE DATABASE test5;
+CREATE DATABASE test6;
+
+-- 3. Выдача прав на подключение и создание схем в базах
+GRANT CONNECT ON DATABASE test1 TO my_user;
+GRANT CONNECT ON DATABASE test2 TO my_user;
+GRANT CONNECT ON DATABASE test3 TO my_user;
+GRANT CONNECT ON DATABASE test4 TO my_user;
+GRANT CONNECT ON DATABASE test5 TO my_user;
+GRANT CONNECT ON DATABASE test6 TO my_user;
+
+GRANT CREATE ON DATABASE test1 TO my_user;
+GRANT CREATE ON DATABASE test2 TO my_user;
+GRANT CREATE ON DATABASE test3 TO my_user;
+GRANT CREATE ON DATABASE test4 TO my_user;
+GRANT CREATE ON DATABASE test5 TO my_user;
+GRANT CREATE ON DATABASE test6 TO my_user;
+
+-- 4. Для каждой БД: подключение и выдача прав на схему public
+
+-- Для test1
+\c test1
+GRANT USAGE ON SCHEMA public TO my_user;
+GRANT CREATE ON SCHEMA public TO my_user;
+
+-- Для test2
+\c test2
+GRANT USAGE ON SCHEMA public TO my_user;
+GRANT CREATE ON SCHEMA public TO my_user;
+
+-- Для test3
+\c test3
+GRANT USAGE ON SCHEMA public TO my_user;
+GRANT CREATE ON SCHEMA public TO my_user;
+
+-- Для test4
+\c test4
+GRANT USAGE ON SCHEMA public TO my_user;
+GRANT CREATE ON SCHEMA public TO my_user;
+
+-- Для test5
+\c test5
+GRANT USAGE ON SCHEMA public TO my_user;
+GRANT CREATE ON SCHEMA public TO my_user;
+
+-- Для test6
+\c test6
+GRANT USAGE ON SCHEMA public TO my_user;
+GRANT CREATE ON SCHEMA public TO my_user;
