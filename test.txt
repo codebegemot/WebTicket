@@ -55,3 +55,94 @@ GRANT CREATE ON SCHEMA public TO my_user;
 \c test6
 GRANT USAGE ON SCHEMA public TO my_user;
 GRANT CREATE ON SCHEMA public TO my_user;
+
+
+<script>
+    let lastLog = "";
+    let unchangedCount = 0;
+    let maxUnchangedCount = 10;
+    let intervalId = null;
+    let appRunning = false;
+
+    function checkAppStatusAndLog() {
+        fetch('/LoadTicketing/GetStatus')
+            .then(res => res.json())
+            .then(data => {
+                const statusText = document.getElementById('logStatus');
+                const startBtn = document.getElementById('startAppBtn');
+
+                appRunning = data.appStarted;
+
+                if (appRunning) {
+                    statusText.innerText = "Приложение запущено.";
+                    startBtn.disabled = true;
+                    fetchLog(); // подгрузим лог
+                } else {
+                    statusText.innerText = "Приложение остановлено.";
+                    startBtn.disabled = false;
+
+                    if (intervalId !== null) {
+                        clearInterval(intervalId);
+                        intervalId = null;
+                        console.log("Опрос логов остановлен — приложение завершено.");
+                    }
+                }
+            });
+    }
+
+    function fetchLog() {
+        fetch('/LoadTicketing/GetLog')
+            .then(response => {
+                if (!response.ok) throw new Error("Ошибка получения лога.");
+                return response.text();
+            })
+            .then(data => {
+                if (data === lastLog) {
+                    unchangedCount++;
+                    if (unchangedCount >= maxUnchangedCount) {
+                        clearInterval(intervalId);
+                        intervalId = null;
+                        const status = document.getElementById('logStatus');
+                        status.innerText = "Лог не обновляется. Опрос остановлен.";
+                    }
+                } else {
+                    unchangedCount = 0;
+                    lastLog = data;
+                    document.getElementById('logContainer').textContent = data;
+                }
+            })
+            .catch(error => {
+                console.error("Ошибка при получении лога:", error);
+                clearInterval(intervalId);
+                intervalId = null;
+            });
+    }
+
+    function startLogAndStatusUpdates() {
+        if (intervalId !== null) clearInterval(intervalId);
+
+        intervalId = setInterval(() => {
+            checkAppStatusAndLog();
+        }, 10000);
+
+        checkAppStatusAndLog(); // сразу при старте
+    }
+
+    document.getElementById('startAppBtn').addEventListener("click", () => {
+        fetch('/LoadTicketing/RunApp')
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('startAppBtn').disabled = true;
+                    document.getElementById('logStatus').innerText = "Приложение запускается...";
+                    setTimeout(() => {
+                        startLogAndStatusUpdates();
+                    }, 3000); // небольшая задержка, чтобы лог успел появиться
+                } else {
+                    alert("Ошибка запуска приложения.");
+                }
+            });
+    });
+
+    // Проверим статус и начнем автообновление при загрузке страницы
+    startLogAndStatusUpdates();
+</script>
